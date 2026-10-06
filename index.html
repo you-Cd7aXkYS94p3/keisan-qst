@@ -11,7 +11,7 @@
 <title>お金の計算クエスト</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&family=Martian+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&family=Martian+Mono:wght@500;700&family=DotGothic16&display=swap">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%}
@@ -21,30 +21,23 @@ img{max-width:100%}
 <style>
 /* Layout: one narrow column. A wallet panel (累計ポイント) on top, the quest board below, then records and settings. */
 :root{
-  --bg:#EAF1EC;          /* pale banknote green */
-  --panel:#F8FBF8;
-  --ink:#16302A;
-  --muted:#5B726B;
-  --line:#C9D8D0;
-  --green:#1F6E50;       /* bill green */
-  --gold:#C98E0C;        /* coin */
-  --gold-soft:#F6E3AE;
+  --bg:#EAF5FF;          /* sky */
+  --panel:#FFFFFF;
+  --ink:#1E3A5C;
+  --muted:#5B7590;
+  --line:#CFE2F3;
+  --green:#2479C9;       /* main blue (token name kept) */
+  --gold:#FFB300;        /* coin */
+  --gold-soft:#FFE9A8;
   --ok:#1E8A55;
-  --ng:#B83A26;
+  --ng:#C8402A;
   --key:#FFFFFF;
-  --key-press:#DCE8E1;
+  --key-press:#E3F0FB;
+  color-scheme:light;
   --f-display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
   --f-body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;
   --f-num:"Martian Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0F1915;--panel:#17241F;--ink:#E4EFE9;--muted:#93ABA2;--line:#2B3D36;
-  --green:#58C092;--gold:#F0B93A;--gold-soft:#3A2E10;--ok:#4FD08E;--ng:#F07A63;
-  --key:#1D2C26;--key-press:#2A3E36;color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0F1915;--panel:#17241F;--ink:#E4EFE9;--muted:#93ABA2;--line:#2B3D36;
-  --green:#58C092;--gold:#F0B93A;--gold-soft:#3A2E10;--ok:#4FD08E;--ng:#F07A63;
-  --key:#1D2C26;--key-press:#2A3E36;color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
@@ -59,8 +52,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-o
 .wallet{background:var(--green);color:#fff;border-radius:18px;padding:18px 20px;display:grid;gap:10px;position:relative;overflow:hidden}
 .wallet::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;
   border:14px solid rgba(255,255,255,.08)}
-:root[data-theme="dark"] .wallet{color:#0F1915}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wallet{color:#0F1915}}
 .wallet .lbl{font-size:.8rem;letter-spacing:.12em;font-weight:700;opacity:.85}
 .total{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .total b{font-family:var(--f-display);font-weight:400;font-size:clamp(2.6rem,12vw,3.6rem);line-height:1;font-variant-numeric:tabular-nums}
@@ -70,24 +61,20 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-o
 .hero{display:flex;align-items:center;gap:14px;margin-top:4px}
 .hero .rank{flex:1;min-width:0}
 .sprite-box{flex:none;width:80px;height:80px;border-radius:14px;background:rgba(255,255,255,.16);display:grid;place-items:center}
-:root[data-theme="dark"] .sprite-box{background:rgba(0,0,0,.14)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sprite-box{background:rgba(0,0,0,.14)}}
 #sprite{width:64px;height:64px;image-rendering:pixelated;image-rendering:crisp-edges;animation:bob 1s steps(2) infinite}
 @keyframes bob{0%{transform:translateY(0)}100%{transform:translateY(-4px)}}
 .rank{display:grid;gap:6px}
 .rank-top{display:flex;justify-content:space-between;gap:8px;font-size:.85rem;font-weight:700;flex-wrap:wrap}
 .bar{height:8px;border-radius:99px;background:rgba(255,255,255,.22);overflow:hidden}
 .bar i{display:block;height:100%;background:var(--gold-soft);width:0;transition:width .5s ease}
-:root[data-theme="dark"] .bar{background:rgba(0,0,0,.22)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bar{background:rgba(0,0,0,.22)}}
-.coin-pop{position:absolute;right:18px;top:34px;font-family:var(--f-display);color:var(--gold);font-size:1.4rem;pointer-events:none;opacity:0}
-.coin-pop.go{animation:pop .9s ease-out}
+.coin-pop{display:none;position:absolute;right:18px;top:34px;font-family:var(--f-display);color:var(--gold);font-size:1.4rem;pointer-events:none;opacity:0}
+.coin-pop.play{animation:pop .9s ease-out}
 @keyframes pop{0%{opacity:0;transform:translateY(10px)}20%{opacity:1}100%{opacity:0;transform:translateY(-34px)}}
 
 /* Tabs */
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:4px;position:sticky;top:env(safe-area-inset-top,0px);z-index:2}
+.tabs{display:grid;grid-template-columns:1.1fr 1fr 1.2fr;gap:4px;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:4px;position:sticky;top:env(safe-area-inset-top,0px);z-index:2}
 .tabs button{border:0;background:transparent;border-radius:10px;padding:10px 8px;font-weight:900;font-size:1rem;display:flex;align-items:center;justify-content:center;gap:8px}
-.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.tabs button[aria-selected="true"]{background:var(--green);color:#fff}
 .tabpt{font-family:var(--f-num);font-size:.78rem;font-weight:700;background:var(--gold);color:#1B1300;border-radius:99px;padding:1px 8px}
 .pane{display:flex;flex-direction:column;gap:20px}
 
@@ -95,7 +82,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-o
 .board{display:grid;gap:14px}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
 .seg button{border:1.5px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 14px;font-weight:700;font-size:.92rem}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--green);color:#fff;border-color:var(--green)}
 .seglbl{font-size:.75rem;color:var(--muted);font-weight:700;letter-spacing:.1em;margin-bottom:4px}
 .problem{position:relative;background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:18px 16px;display:grid;gap:14px;text-align:center}
 .qno{font-size:.8rem;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;gap:8px}
@@ -150,6 +137,68 @@ section h2{font-family:var(--f-display);font-weight:400;font-size:1.05rem;margin
 .whopanel{background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:18px 16px;display:grid;gap:14px}
 .whopanel h2{font-family:var(--f-display);font-weight:400;font-size:1.3rem;margin:0}
 .whopanel .seg button{font-size:1.05rem;padding:10px 18px}
+.gorow{display:flex;gap:8px}
+.gorow .go{flex:1}
+.idk{flex:none;border:1.5px solid var(--line);background:var(--panel);border-radius:14px;padding:0 16px;font-weight:700;font-size:.95rem;color:var(--muted)}
+.idk[hidden]{display:none}
+.taintro{background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:22px 16px;display:grid;gap:14px;text-align:center}
+.taintro p{margin:0}
+#taOpSlot .seg{justify-content:center}
+.tabig{font-family:var(--f-display);font-size:1.8rem;color:var(--green)}
+.tares{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tares div{display:grid;gap:2px;background:var(--bg);border-radius:12px;padding:10px 4px}
+.tares span{font-size:.75rem;color:var(--muted);font-weight:700}
+.tares b{font-family:var(--f-num);font-size:1.2rem}
+.tatimer{display:grid;gap:6px;text-align:left}
+.tarow{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.9rem}
+.tarow b{font-family:var(--f-num);font-size:1.1rem}
+.taquit{border:0;background:transparent;color:var(--muted);font-weight:700;font-size:.85rem;text-decoration:underline}
+.tabar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.tabar i{display:block;height:100%;width:100%;background:var(--gold);transition:width .25s linear}
+.tatimer.hurry .tabar i{background:var(--ng)}
+.tatimer.hurry .tarow b{color:var(--ng)}
+.problem.bonus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.bonustag{display:inline-block;background:var(--gold);color:#1B1300;border-radius:99px;padding:0 10px;font-weight:900}
+.startrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.go.alt{background:var(--green);color:#fff}
+/* 8bit battle scene */
+.scene{display:grid;gap:8px;margin-inline:-4px}
+.bfield{position:relative;height:150px;border-radius:12px;overflow:hidden;
+  background:linear-gradient(#BFE3FF 0 58%,#8ED16F 58% 61%,#6DBA52 61% 100%);
+  display:flex;justify-content:space-between;align-items:flex-end;padding:0 22px 14px;image-rendering:pixelated}
+.bfield::before{content:"";position:absolute;left:12%;top:16px;width:46px;height:12px;background:#fff;border-radius:6px;box-shadow:16px -8px 0 -2px #fff,60px 10px 0 -3px #fff,190px 2px 0 0 #fff,210px -6px 0 -2px #fff;opacity:.9}
+.fighter{position:relative;display:grid;justify-items:center;gap:2px}
+.fighter canvas{width:80px;height:80px;image-rendering:pixelated;image-rendering:crisp-edges}
+.mon canvas{width:96px;height:96px}
+.mon.boss canvas{width:120px;height:120px}
+.nameplate{font:12px/1.2 "DotGothic16",var(--f-body);background:rgba(0,0,0,.55);color:#fff;padding:1px 6px;border-radius:3px;max-width:110px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.rpgwin{font:16px/1.55 "DotGothic16",var(--f-body);background:#14183A;color:#fff;border:3px solid #fff;outline:3px solid #14183A;border-radius:6px;
+  padding:8px 12px;min-height:3.9em;text-align:left;white-space:pre-line;letter-spacing:.04em}
+.hero.attack{animation:lunge .32s steps(4)}
+@keyframes lunge{50%{transform:translateX(70px)}}
+.mon.attack{animation:lungeL .32s steps(4)}
+@keyframes lungeL{50%{transform:translateX(-70px)}}
+.mon.hurt canvas{animation:blink .45s steps(2) 2}
+@keyframes blink{50%{opacity:0}}
+.mon.dead canvas{animation:defeat .55s steps(5) .35s forwards}
+@keyframes defeat{to{opacity:0;transform:scale(1.25,.15) translateY(40px)}}
+.mon.flee canvas{animation:flee .6s steps(6) forwards}
+@keyframes flee{to{opacity:0;transform:translateX(120px)}}
+.mon.appear canvas{animation:appear .35s steps(4)}
+@keyframes appear{from{opacity:0;transform:translateY(-20px)}}
+.scene.shake{animation:shake .35s steps(6)}
+@keyframes shake{20%{transform:translate(-6px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
+.slash{position:absolute;inset:-6px;opacity:0;pointer-events:none;
+  background:linear-gradient(135deg,transparent 44%,#fff 45% 49%,transparent 50%),linear-gradient(135deg,transparent 30%,#fff 31% 33%,transparent 34%),linear-gradient(135deg,transparent 60%,#fff 61% 63%,transparent 64%)}
+.slash.play{animation:slash .3s steps(3)}
+@keyframes slash{0%{opacity:1;clip-path:inset(0 100% 100% 0)}100%{opacity:1;clip-path:inset(0 0 0 0)}}
+.dmg{position:absolute;left:50%;top:10px;transform:translateX(-50%);font:900 20px "DotGothic16",var(--f-num);color:#FFE14D;text-shadow:2px 2px 0 #14183A;opacity:0;white-space:nowrap}
+.dmg.play{animation:dmgpop .8s steps(6) forwards}
+@keyframes dmgpop{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-30px)}}
+.tabs button{white-space:nowrap;font-size:.95rem;padding-inline:4px;gap:6px}
+.tabs .tabpt{font-size:.72rem;padding:1px 6px}
+.tabonus{background:var(--gold-soft);border-radius:12px;padding:10px;font-weight:700}
+.tabonus b{font-family:var(--f-num);font-size:1.15rem}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -171,13 +220,15 @@ section h2{font-family:var(--f-display);font-weight:400;font-size:1.05rem;margin
   </div>
 
   <div class="tabs" role="tablist" id="tabsBar">
-    <button role="tab" id="tab-quest" aria-controls="pane-quest" aria-selected="true">クエスト</button>
-    <button role="tab" id="tab-points" aria-controls="pane-points" aria-selected="false">ポイント <span class="tabpt" id="tabPt">0pt</span></button>
+    <button role="tab" id="tab-points" aria-controls="pane-points" aria-selected="true">ポイント <span class="tabpt" id="tabPt">0pt</span></button>
+    <button role="tab" id="tab-practice" aria-controls="pane-quest" aria-selected="false">練習</button>
+    <button role="tab" id="tab-ta" aria-controls="pane-quest" aria-selected="false">タイムアタック</button>
   </div>
 
-  <div class="pane" id="pane-quest" role="tabpanel" aria-labelledby="tab-quest">
+  <div class="pane" id="pane-quest" role="tabpanel" hidden>
     <div class="board">
-      <div>
+      <div id="practiceOpSlot"></div>
+      <div id="opBlock">
         <div class="seglbl">しゅるい（大きな数）</div>
         <div class="seg" id="opSeg">
           <button data-op="mul" aria-pressed="false">かけ算</button>
@@ -186,9 +237,38 @@ section h2{font-family:var(--f-display);font-weight:400;font-size:1.05rem;margin
         </div>
       </div>
 
-      <div class="problem">
+      <div class="taintro" id="taIntro" hidden>
+        <div class="tabig">10分で5問</div>
+        <p>5問目は<b>ボーナス問題</b>。正解するとポイントが<b>5倍</b>！<br>5問ぜんぶ正解すると、<b>のこり時間1分ごとに +1pt</b>。<br>まちがえても、時間内ならなんどでもやり直せます。</p>
+        <div id="taOpSlot"></div>
+        <button class="go" id="taStart">スタート</button>
+      </div>
+
+      <div class="taintro" id="taResult" hidden>
+        <div class="tabig" id="taResTitle">クリア！</div>
+        <div class="tabonus" id="taBonusRow" hidden>のこり <b id="taBonusMin">0分</b> → タイムボーナス <b id="taBonusPt">+0pt</b></div>
+        <div class="tares">
+          <div><span>せいかい</span><b id="taResOk">0 / 5</b></div>
+          <div><span>もらったポイント</span><b id="taResPt">0pt</b></div>
+          <div><span>タイム</span><b id="taResTime">0:00</b></div>
+        </div>
+        <button class="go" id="taAgain">もう一度ちょうせん</button>
+      </div>
+
+      <div class="problem" id="problemBox">
         <div class="coin-pop" id="coinPop">+1pt</div>
+        <div class="tatimer" id="taTimer" hidden>
+          <div class="tarow"><span>のこり <b id="taLeft">10:00</b></span><button class="taquit" id="taQuit">やめる</button></div>
+          <div class="tabar"><i id="taBar"></i></div>
+        </div>
         <div class="qno"><span id="qLabel">ミックス</span><span id="qCount">第1問</span></div>
+        <div class="scene" id="scene" aria-hidden="true" hidden>
+          <div class="bfield">
+            <div class="fighter hero" id="heroBox"><canvas id="heroCv" width="16" height="16"></canvas><div class="nameplate" id="heroName">ゆうしゃ</div></div>
+            <div class="fighter mon" id="monBox"><canvas id="monCv" width="16" height="16"></canvas><div class="slash" id="slash"></div><div class="dmg" id="dmg"></div></div>
+          </div>
+          <div class="rpgwin" id="rpgWin" aria-live="polite"></div>
+        </div>
         <div class="expr" id="expr">&nbsp;</div>
         <div class="ans"><input id="answer" type="text" inputmode="decimal" autocomplete="off" aria-label="こたえ" placeholder="?"></div>
         <div class="msg" id="msg" aria-live="assertive"></div>
@@ -198,13 +278,13 @@ section h2{font-family:var(--f-display);font-weight:400;font-size:1.05rem;margin
           <button>1</button><button>2</button><button>3</button>
           <button>.</button><button>0</button><button data-k="del" aria-label="1文字けす">⌫</button>
         </div>
-        <button class="go" id="goBtn">こたえる</button>
-        <div class="sess"><span>このプレイ <b id="sOk">0</b> / <b id="sAll">0</b> 正解</span><span>連続 <b id="sStreak">0</b></span></div>
+        <div class="gorow"><button class="go" id="goBtn">こたえる</button><button class="idk" id="idkBtn">わからない</button></div>
+        <div class="sess" id="sessRow"><span>このプレイ <b id="sOk">0</b> / <b id="sAll">0</b> 正解</span><span>連続 <b id="sStreak">0</b></span></div>
       </div>
     </div>
   </div>
 
-  <div class="pane" id="pane-points" role="tabpanel" aria-labelledby="tab-points" hidden>
+  <div class="pane" id="pane-points" role="tabpanel" aria-labelledby="tab-points">
     <div class="wallet" aria-live="polite">
       <div class="lbl">累計ポイント</div>
       <div class="total"><b id="total">0</b><span>pt</span></div>
@@ -221,8 +301,13 @@ section h2{font-family:var(--f-display);font-weight:400;font-size:1.05rem;margin
       </div>
     </div>
 
+    <div class="startrow">
+      <button class="go" id="goPractice">れんしゅうする</button>
+      <button class="go alt" id="goTA">タイムアタック</button>
+    </div>
+
     <section>
-      <h2>この7日間の正解数</h2>
+      <h2>この7日間のポイント</h2>
       <div class="week" id="week"></div>
     </section>
 
@@ -375,42 +460,184 @@ function renderWeek(){
 }
 function renderSession(){el.sOk.textContent=sOk;el.sAll.textContent=sAll;el.sStreak.textContent=streak}
 
+/* ---------- 8bit battle ---------- */
+const MONSTERS=[{"id":"kinoko","name":"どくキノコ","boss":false,"pal":{"k":"#2B1D14","r":"#8E5CD9","w":"#FFE14D","s":"#F4E4C8","n":"#B34A3A","e":"#2B1D14"},"rows":["................",".....kkkkkk.....","...kkrrrrrrkk...","..krrwrrrrwrrk..",".krrrrrrwrrrrrk.",".krwrrrrrrrrwrk.","krrrrrwrrrrrrrrk","kkrrrrrrrrrwrrkk","..kkkkkkkkkkkk..","....kssssssk....","....kkssssks....","....skksskks....","....ssssssss....","....ksnnnnsk....","...kkk....kkk...","................"]},{"id":"koumori","name":"コウモリン","boss":false,"pal":{"k":"#2B1D14","p":"#7A4FC2","d":"#4E2F86","w":"#FFFFFF","y":"#FFD23F","f":"#FFFFFF"},"rows":["................","................","k.....k..k.....k","kk....kkkk....kk","kpk..kppppk..kpk","kppkkppppppkkppk","kpppppywpywppppk","kdpppppppppppddk",".kddppfppfppddk.","..kdkdpppppdkdk.","...k.kdpppdk.k..","......kdddk.....",".......kkk......","................","................","................"]},{"id":"golem","name":"いわゴーレム","boss":false,"pal":{"k":"#2B1D14","g":"#9AA5B1","G":"#6B7785","l":"#C9D1D9","e":"#FF5A3C","m":"#4CAF50"},"rows":["................",".....kkkkkk.....","....kllggggk....","...klgggggggk...","...kgekggekgk...","...kggggggggk...","..kkGGkkkkGGkk..",".kllgGggggGgglk.","kllggGggmgGgggk.","kgggkGggggGkggk.","kGGk.kGGGGk.kGk.",".kk..kggggk..k..",".....kgkkgk.....","....kGGk.kGGk...","....kkkk.kkkk...","................"]},{"id":"saifu","name":"サイフおばけ","boss":false,"pal":{"k":"#2B1D14","b":"#D9673B","B":"#A4472A","y":"#FFD23F","w":"#FFFFFF","c":"#FFB300"},"rows":["................","......kyyk......",".....kyk.kyk....","....kkkkkkkkk...","...kbbbbbbbbbk..","..kbbbbbbbbbbbk.","..kbwkbbbbwkbbk.","..kbbbbbbbbbbbk.","..kbbbbkkkbbbbk.","..kBbbbbbbbbbBk.","..kBBbbbbbbbBBk.","...kBBBbBBBBBk..","....kBk.kBk.k...","....k....k......","..kck..kck......","..kk...kk......."]},{"id":"kani","name":"ぜにガニ","boss":false,"pal":{"k":"#2B1D14","r":"#E2583E","R":"#B33A25","w":"#FFFFFF","c":"#FFB300","C":"#C98E0C"},"rows":["................",".kk..........kk.","kcCk........kcCk","kCCk...kk...kCCk",".kRk..kwk.k.kRk.","..kRk.kkkwk.kRk.","...kRkkrrkkkRk..","....krrrrrrrrk..","...krrwkrrwkrrk.","..krrrrrrrrrrrk.","..kRrrrrrrrrrRk.","...kRRRRRRRRRk..","..kRk.kRk.kRk.k.",".kRk..kRk..kRk..",".kk...kk....kk..","................"]},{"id":"dragon","name":"きんかドラゴン","boss":true,"pal":{"k":"#2B1D14","y":"#FFC52E","Y":"#D99A00","r":"#E0483A","w":"#FFF1C9","o":"#FF8A00","d":"#7A4FC2"},"rows":["..k..........k..",".kwk........kwk.",".kwk..kkkk..kwk.","..kwkkyyyykkwk..","..kyyyyyyyyyyk..",".kyykrkyykrkyyk.",".kyyyyyyyyyyyyk.","kdkyyywkkwyyykdk","kddkyyyyyyyyykdd","kdddkYooooYkddk.",".kddkYooooYkddk.","..kkkYyooyYkkk..","...kYyyyyyyYk...","..kYYkYYYYkYYk..","..kkk.kkkk.kkk..","................"]}];
+let foe=null,sayTimer=null;
+function drawPix(cv,sp){
+  const cx=cv.getContext("2d");cx.clearRect(0,0,16,16);
+  sp.rows.forEach((r,y)=>{for(let x=0;x<16;x++){const ch=r[x];if(ch==="."||!sp.pal[ch])continue;cx.fillStyle=sp.pal[ch];cx.fillRect(x,y,1,1)}});
+}
+function replay(elm,cls){elm.classList.remove(cls);void elm.offsetWidth;elm.classList.add(cls)}
+function say(text){
+  const w=$("rpgWin");clearInterval(sayTimer);
+  if(reduceMotion){w.textContent=text;return}
+  let i=0;w.textContent="";
+  sayTimer=setInterval(()=>{i+=2;w.textContent=text.slice(0,i);if(i>=text.length)clearInterval(sayTimer)},28);
+}
+function heroName(){return cfg&&cfg.name?cfg.name:"ゆうしゃ"}
+function spawnFoe(boss){
+  const pool=MONSTERS.filter(m=>!!m.boss===!!boss);
+  let m=pool[ri(0,pool.length-1)];
+  if(!boss&&foe&&pool.length>1)while(m.id===foe.id)m=pool[ri(0,pool.length-1)];
+  foe=m;
+  const box=$("monBox");box.className="fighter mon"+(boss?" boss":"");
+  drawPix($("monCv"),m);replay(box,"appear");
+  drawPix($("heroCv"),SPRITES[Math.min(rankOf(state.total),SPRITES.length-1)]);
+  $("heroName").textContent=heroName();
+  say(boss?"ボスの "+m.name+" が あらわれた！\nたおすと ポイント5ばい！":m.name+" が あらわれた！");
+}
+function battleWin(pts){
+  replay($("heroBox"),"attack");sAttack();
+  setTimeout(()=>{replay($("slash"),"play");const b=$("monBox");b.classList.add("hurt");
+    const d=$("dmg");d.textContent="+"+pts+"pt";replay(d,"play");},160);
+  setTimeout(()=>{$("monBox").classList.add("dead");sDefeat()},420);
+  say(heroName()+" の こうげき！\n"+foe.name+" を たおした！ "+pts+"ポイント てにいれた！");
+}
+function battleMiss(){
+  replay($("monBox"),"attack");setTimeout(()=>replay($("scene"),"shake"),150);
+  say(foe.name+" の こうげき！\nこたえが ちがうみたいだ… もういちど！");
+}
+function battleFlee(ans){
+  $("monBox").classList.add("flee");
+  say(foe.name+" は にげていった…\nこたえは "+ans+" だった。");
+}
+
+/* ---------- play modes ---------- */
+const TA_QUESTIONS=5,TA_MS=10*60*1000,TA_BONUS=5;
+let playMode="practice",qToken=0;
+let ta={running:false,idx:0,ok:0,pts:0,start:0,end:0,timer:null};
+function isBonus(){return playMode==="ta"&&ta.running&&ta.idx===TA_QUESTIONS-1}
+function ptsFor(){return isBonus()?TA_BONUS:1}
+
 function next(){
+  if(playMode==="ta"&&!ta.running)return;
   const op=mode==="mix"?["mul","div"][ri(0,1)]:mode;
-  cur=gen(op,level);answered=false;
+  cur=gen(op,level);answered=false;qToken++;
   el.expr.innerHTML="";
   el.expr.append(fmt(cur.a.n,cur.a.dp)+" ");
   const o=document.createElement("span");o.className="op";o.textContent=OPS[op];el.expr.append(o);
   el.expr.append(" "+fmt(cur.b.n,cur.b.dp)+" =");
   el.answer.value="";el.answer.className="";el.msg.textContent="";el.msg.className="msg";
-  el.go.textContent="こたえる";
-  el.qLabel.textContent=OPNAME[mode]+"・大きな数";
-  el.qCount.textContent="第"+(sAll+1)+"問";
+  el.go.textContent="こたえる";$("idkBtn").hidden=false;
+  $("problemBox").classList.toggle("bonus",isBonus());
+  if(playMode==="ta")spawnFoe(isBonus());
+  if(playMode==="ta"){
+    el.qLabel.innerHTML="";
+    if(isBonus()){const t=document.createElement("span");t.className="bonustag";t.textContent="ボーナス問題 ×5";el.qLabel.append(t)}
+    else el.qLabel.textContent="タイムアタック";
+    el.qCount.textContent=(ta.idx+1)+" / "+TA_QUESTIONS+" 問";
+  }else{
+    el.qLabel.textContent=OPNAME[mode]+"・大きな数";
+    el.qCount.textContent="第"+(sAll+1)+"問";
+  }
   if(!coarse)el.answer.focus();
 }
 
+// move on after a problem is finished (correct, or answer shown)
+function advance(){
+  if(!answered)return;
+  if(playMode==="ta"){
+    ta.idx++;
+    if(ta.idx>=TA_QUESTIONS){finishTA("clear");return}
+  }
+  next();
+}
+
 function submit(){
-  if(answered){next();return}
+  if(answered){advance();return}
   const v=parseAnswer(el.answer.value.trim());
   if(v===null){el.msg.className="msg";el.msg.textContent="こたえを入れてね";return}
-  answered=true;sAll++;
-  const right=fmt(cur.ans,2);
   if(v===cur.ans){
-    sOk++;streak++;
-    state.total++;const k=dkey();state.daily[k]=(state.daily[k]||0)+1;
+    const pts=ptsFor();
+    answered=true;sAll++;sOk++;streak++;
+    state.total+=pts;const k=dkey();state.daily[k]=(state.daily[k]||0)+pts;
+    if(playMode==="ta"){ta.ok++;ta.pts+=pts;if(ta.idx===TA_QUESTIONS-1)ta.doneAt=Date.now()}
     el.answer.className="ok";el.msg.className="msg ok";
-    el.msg.textContent=streak>=5&&streak%5===0?"せいかい！ "+streak+"連続！ +1pt":"せいかい！ +1pt";
-    sCoin();coinBurst();el.coin.classList.remove("go");void el.coin.offsetWidth;el.coin.classList.add("go");
-    logCorrect(cur);renderWallet();renderSession();save();
-    setTimeout(()=>{if(answered&&el.msg.classList.contains("ok"))next()},900);
+    el.msg.textContent=pts>1?"ボーナス せいかい！ +"+pts+"pt":(streak>=5&&streak%5===0?"せいかい！ "+streak+"連続！ +1pt":"せいかい！ +1pt");
+    $("idkBtn").hidden=true;el.go.textContent="つぎへ";
+    el.coin.textContent="+"+pts+"pt";
+    if(playMode==="ta"){battleWin(pts);el.msg.textContent=""}
+    setTimeout(()=>{sCoin();coinBurst()},450);
+    if(pts>1){setTimeout(()=>{sCoin();coinBurst()},260);setTimeout(()=>{sCoin();coinBurst()},520)}
+    el.coin.classList.remove("play");void el.coin.offsetWidth;el.coin.classList.add("play");
+    logCorrect(cur,pts);renderWallet();renderSession();save();
+    const tok=qToken;
+    setTimeout(()=>{if(answered&&tok===qToken)advance()},playMode==="ta"?(pts>1?2400:1700):900);
   }else{
+    // keep the same problem; the answer stays hidden until "わからない"
     streak=0;sMiss();
     el.answer.className="ng";el.msg.className="msg ng";
-    el.msg.innerHTML="";el.msg.append("ざんねん… こたえは "+right);
-    const s=document.createElement("small");s.textContent="もう一度タップかEnterで次の問題へ";el.msg.append(s);
-    el.go.textContent="つぎへ";renderSession();
+    el.msg.innerHTML="";
+    if(playMode==="ta")battleMiss();else el.msg.append("ちがうよ。もう一度かんがえてみよう");
+    const sm=document.createElement("small");sm.textContent="わからないときは「わからない」で答えを見られます（ポイントはつきません）";el.msg.append(sm);
+    el.answer.value="";renderSession();
+    if(!coarse)el.answer.focus();
   }
 }
+
+function giveUp(){
+  if(answered)return;
+  answered=true;sAll++;streak=0;
+  if(playMode==="ta"&&ta.running&&ta.idx===TA_QUESTIONS-1)ta.doneAt=Date.now();
+  el.answer.className="";el.answer.value=fmt(cur.ans,2);if(playMode==="ta")battleFlee(fmt(cur.ans,2));
+  el.msg.className="msg ng";el.msg.innerHTML="";el.msg.append("こたえは "+fmt(cur.ans,2));
+  const sm=document.createElement("small");sm.textContent="「つぎへ」で次の問題へ";el.msg.append(sm);
+  $("idkBtn").hidden=true;el.go.textContent="つぎへ";renderSession();
+}
+
+/* ---------- time attack ---------- */
+function fmtMs(ms){const t=Math.max(0,Math.ceil(ms/1000));return Math.floor(t/60)+":"+String(t%60).padStart(2,"0")}
+function setPlayMode(m){
+  if(ta.running)stopTA();
+  playMode=m;
+  (m==="ta"?$("taOpSlot"):$("practiceOpSlot")).append($("opBlock"));
+  $("scene").hidden=m!=="ta";
+  $("taIntro").hidden=m!=="ta";$("taResult").hidden=true;
+  $("problemBox").hidden=m==="ta";$("taTimer").hidden=true;
+  $("problemBox").classList.remove("bonus");
+  $("sessRow").hidden=m==="ta";
+  if(m==="practice")next();
+}
+function lockControls(on){
+  $("opSeg").querySelectorAll("button").forEach(b=>b.disabled=on);
+  $("tab-practice").disabled=on;
+}
+function startTA(){
+  ta={doneAt:0,running:true,idx:0,ok:0,pts:0,start:Date.now(),end:Date.now()+TA_MS,timer:null};
+  $("taIntro").hidden=true;$("taResult").hidden=true;$("problemBox").hidden=false;$("taTimer").hidden=false;
+  lockControls(true);tickTA();ta.timer=setInterval(tickTA,250);
+  sStart();next();
+}
+function tickTA(){
+  if(!ta.running||ta.doneAt)return;
+  const left=ta.end-Date.now();
+  $("taLeft").textContent=fmtMs(left);
+  $("taBar").style.width=Math.max(0,left/TA_MS*100)+"%";
+  $("taTimer").classList.toggle("hurry",left<=60000);
+  if(left<=0)finishTA("time");
+}
+function stopTA(){ta.running=false;clearInterval(ta.timer);lockControls(false);$("taTimer").hidden=true;$("problemBox").classList.remove("bonus")}
+function finishTA(why){
+  const used=Math.min(TA_MS,(ta.doneAt||Date.now())-ta.start);
+  // time bonus: all 5 correct → 1pt per whole minute left
+  const bonusMin=why==="clear"&&ta.ok===TA_QUESTIONS?Math.floor((TA_MS-used)/60000):0;
+  if(bonusMin>0){
+    ta.pts+=bonusMin;state.total+=bonusMin;const k=dkey();state.daily[k]=(state.daily[k]||0)+bonusMin;
+    logBonus(bonusMin);renderWallet();save();
+    setTimeout(()=>{sCoin();coinBurst()},500);
+  }
+  $("taBonusRow").hidden=!(why==="clear"&&ta.ok===TA_QUESTIONS);
+  $("taBonusMin").textContent=Math.floor((TA_MS-used)/60000)+"分";
+  $("taBonusPt").textContent="+"+bonusMin+"pt";
+  stopTA();
+  $("problemBox").hidden=true;$("taResult").hidden=false;
+  $("taResTitle").textContent=why==="time"?"タイムアップ！":(ta.ok===TA_QUESTIONS?"パーフェクト！ ボスげきは！":"クリア！");
+  $("taResOk").textContent=ta.ok+" / "+TA_QUESTIONS;
+  $("taResPt").textContent=ta.pts+"pt";
+  $("taResTime").textContent=fmtMs(used);
+  if(why==="time")sMiss();else sFanfare();
+}
+function quitTA(){stopTA();setPlayMode("ta")}
 
 /* ---------- storage: Google Sheets (via the Apps Script web app), with an on-device queue ---------- */
 // 記録先：スプレッドシートの Apps Script を「ウェブアプリ」としてデプロイしたURLと、「設定」シートB2の合言葉
@@ -434,18 +661,27 @@ function saveLocal(){}
 function loadLocal(){return null}
 function save(){if(linked())sync()}
 
-function uid(){return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10)}
-function logCorrect(p){
+// time bonus is sent as records of at most 5pt each (the sheet accepts 1–5pt per record)
+function logBonus(min){
   if(!linked())return;
-  queue.push({id:uid(),name:cfg.name,ts:Date.now(),op:OPNAME[p.op]||p.op,q:fmt(p.a.n,p.a.dp)+" "+OPS[p.op]+" "+fmt(p.b.n,p.b.dp)+" = "+fmt(p.ans,2)});
+  let left=min;
+  while(left>0){const c=Math.min(5,left);queue.push({id:uid(),name:cfg.name,ts:Date.now(),pt:c,op:"タイムボーナス",q:"のこり"+min+"分"});left-=c}
+  lsSet(Q_KEY,queue);
+}
+function uid(){return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10)}
+function logCorrect(p,pts){
+  if(!linked())return;
+  pts=pts||1;
+  queue.push({id:uid(),name:cfg.name,ts:Date.now(),pt:pts,op:(OPNAME[p.op]||p.op)+(playMode==="ta"?(pts>1?"・TAボーナス":"・TA"):""),q:fmt(p.a.n,p.a.dp)+" "+OPS[p.op]+" "+fmt(p.b.n,p.b.dp)+" = "+fmt(p.ans,2)});
   if(queue.length>2000)queue=queue.slice(-2000);
   lsSet(Q_KEY,queue);
 }
 function applyServer(){
   const mine=myQueue(),s=server&&server.name===cfg.name?server:{total:0,paid:0,rate:1,daily:{}};
   const daily=Object.assign({},s.daily||{});
-  mine.forEach(i=>{const k=dkey(new Date(i.ts));daily[k]=(daily[k]||0)+1});
-  state={total:(s.total||0)+mine.length,paid:s.paid||0,rate:typeof s.rate==="number"?s.rate:1,daily};
+  let pend=0;
+  mine.forEach(i=>{const p=i.pt||1;pend+=p;const k=dkey(new Date(i.ts));daily[k]=(daily[k]||0)+p});
+  state={total:(s.total||0)+pend,paid:s.paid||0,rate:typeof s.rate==="number"?s.rate:1,daily};
   renderWallet();
 }
 async function post(body){
@@ -511,7 +747,7 @@ function pickName(n){
   n=String(n||"").trim().replace(/^[=+\-@'\s]+/,"").slice(0,20);
   if(!n){$("whoMsg").textContent="なまえを入れてね。";return}
   cfg={name:n};lsSet(CFG_KEY,cfg);linkStatus="";
-  $("whoPanel").hidden=true;$("tabsBar").hidden=false;showTab("quest");
+  $("whoPanel").hidden=true;$("tabsBar").hidden=false;showTab("points");
   sOk=0;sAll=0;streak=0;renderSession();
   applyServer();renderLink();sync();next();
 }
@@ -539,6 +775,10 @@ function sCoin(){ // チャリン: two bright bell tones + shimmer
   tone(2637,0.08,0.55,"square",0.05);tone(2637,0.08,0.6,"sine",0.09);
   tone(5274,0.08,0.35,"sine",0.025);
 }
+function sStart(){if(soundOn){tone(660,0,0.1,"square",0.05);tone(990,0.12,0.18,"square",0.05)}}
+function sFanfare(){if(soundOn){[523,659,784,1047].forEach((f,i)=>tone(f,i*0.12,i===3?0.5:0.14,"square",0.05))}}
+function sAttack(){if(soundOn){tone(1400,0,0.05,"square",0.05);tone(700,0.04,0.08,"square",0.05);tone(350,0.09,0.1,"square",0.05)}}
+function sDefeat(){if(soundOn){[784,659,523,392].forEach((f,i)=>tone(f,i*0.07,0.09,"square",0.045))}}
 function sMiss(){if(soundOn){tone(220,0,0.18,"triangle",0.08);tone(165,0.12,0.28,"triangle",0.08)}}
 
 /* ---------- coin burst ---------- */
@@ -581,6 +821,10 @@ $("keys").addEventListener("click",e=>{
   }
 });
 el.go.addEventListener("click",submit);
+$("idkBtn").addEventListener("click",giveUp);
+$("taStart").addEventListener("click",startTA);
+$("taAgain").addEventListener("click",startTA);
+$("taQuit").addEventListener("click",quitTA);
 el.answer.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();submit()}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&answered&&document.activeElement!==el.answer&&document.activeElement.tagName!=="BUTTON"){submit()}});
 el.answer.addEventListener("input",()=>{if(answered)el.answer.value=el.answer.value});
@@ -590,18 +834,24 @@ function segInit(id,attr,set){
   seg.addEventListener("click",e=>{
     const b=e.target.closest("button");if(!b)return;
     seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
-    set(b.dataset[attr]);next();
+    if(b.disabled)return;
+    set(b.dataset[attr]);if(playMode==="practice")next();
   });
 }
 segInit("opSeg","op",v=>mode=v);
 function showTab(name){
-  ["quest","points"].forEach(n=>{
-    $("tab-"+n).setAttribute("aria-selected",n===name?"true":"false");
-    $("pane-"+n).hidden=n!==name;
-  });
+  $("pane-points").hidden=name!=="points";$("pane-quest").hidden=name!=="quest";
+  $("tab-points").setAttribute("aria-selected",name==="points"?"true":"false");
+  $("tab-practice").setAttribute("aria-selected",name==="quest"&&playMode==="practice"?"true":"false");
+  $("tab-ta").setAttribute("aria-selected",name==="quest"&&playMode==="ta"?"true":"false");
   if(name==="quest"&&!coarse&&!answered)el.answer.focus();
 }
-$("tab-quest").addEventListener("click",()=>showTab("quest"));
+function openPractice(){if(ta.running)return;if(playMode!=="practice")setPlayMode("practice");showTab("quest")}
+function openTA(){if(!ta.running&&playMode!=="ta")setPlayMode("ta");showTab("quest")}
+$("tab-practice").addEventListener("click",openPractice);
+$("tab-ta").addEventListener("click",openTA);
+$("goPractice").addEventListener("click",openPractice);
+$("goTA").addEventListener("click",openTA);
 $("tab-points").addEventListener("click",()=>showTab("points"));
 
 let rateTimer;
@@ -634,7 +884,7 @@ $("newNameBtn").addEventListener("click",()=>pickName($("newName").value));
 $("newName").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();pickName($("newName").value)}});
 $("whoBtn").addEventListener("click",()=>{showWho("");loadNames()});
 $("changeName").addEventListener("click",()=>{showWho("");loadNames()});
-$("whoBack").addEventListener("click",()=>{$("whoPanel").hidden=true;$("tabsBar").hidden=false;showTab("quest")});
+$("whoBack").addEventListener("click",()=>{$("whoPanel").hidden=true;$("tabsBar").hidden=false;showTab("points")});
 window.addEventListener("online",()=>{if(linked())sync()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&linked())sync()});
 
